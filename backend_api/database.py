@@ -28,7 +28,7 @@ class Device(Base):                                             #   registered d
     owner_id = Column(Integer, ForeignKey("users.id"))          #   owner id
     
     owner = relationship("User", back_populates="devices")
-    records = relationship("ToxicRecord", back_populates="device")
+    #records = relationship("ToxicRecord", back_populates="device")
 
 # class ToxicRecord(Base):                                        #   toxicity records    (TBD)
 #     __tablename__ = "toxic_records"
