@@ -40,9 +40,9 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     
     if expires_delta:
-        expire = datetime.now(datetime.timezone.utc) + expires_delta
+        expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.now(datetime.timezone.utc) + timedelta(minutes=15)
+        expire = datetime.utcnow() + timedelta(minutes=15)
         
     to_encode.update({"exp": expire})
     
