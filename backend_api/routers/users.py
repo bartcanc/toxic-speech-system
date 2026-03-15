@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from email_validator import validate_email, EmailNotValidError
 
 import database
 import auth
@@ -9,6 +10,11 @@ router = APIRouter(prefix="/api/users", tags=["users"])
 
 @router.post("/register", response_model=schemas.UserResponse)
 def register_user(user: schemas.UserCreate, db: Session = Depends(database.get_db)):                #   depends to open database in case its not open already
+    # try:
+    #     validate_email(user.email)
+    # except EmailNotValidError:
+    #     raise HTTPException(status_code=400, detail="Niewłaściwy format adresu email")
+    
     db_user = db.query(database.User).filter(database.User.email == user.email).first()             #   check user by email
     if db_user:
         raise HTTPException(status_code=400, detail="Ten email jest już zarejestrowany")            #   if user exists, return 400
@@ -24,6 +30,11 @@ def register_user(user: schemas.UserCreate, db: Session = Depends(database.get_d
 
 @router.post("/login", response_model=schemas.Token)
 def login(user_credentials: schemas.UserLogin, db: Session = Depends(database.get_db)):             #   depends to open database in case its not open already
+    # try:
+    #     validate_email(user.email)
+    # except EmailNotValidError:
+    #     raise HTTPException(status_code=400, detail="Nieprawidłowy email lub hasło")
+
     user = db.query(database.User).filter(database.User.email == user_credentials.email).first()    #   check user by email
     
     if not user or not auth.verify_password(user_credentials.password, user.hashed_password):       #   if the user does not exist or an email/password was wrong 
