@@ -10,9 +10,18 @@ print("Ładowanie modelu z dysku...")
 tokenizer = AutoTokenizer.from_pretrained(model_path)
 model = AutoModelForSequenceClassification.from_pretrained(model_path)
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+if torch.cuda.is_available():
+    device = torch.device("cuda")
+    print(f"Wykryto GPU NVIDIA: {torch.cuda.get_device_name(0)}")
+elif torch.backends.mps.is_available():
+    device = torch.device("mps")
+    print("Wykryto akcelerator Apple Silicon (Metal/MPS).")
+else:
+    device = torch.device("cpu")
+    print("Brak sprzętowego wsparcia GPU. System użyje procesora (CPU).")
+
 model.to(device)
-print(f"Model gotowy i załadowany na: {device.upper()}\n")
+print(f"Model gotowy i załadowany\n")
 """
 === KROK 2: FUNKCJA OCENY TEKSTU  ===
 """

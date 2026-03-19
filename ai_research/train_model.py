@@ -10,10 +10,15 @@ from torch.utils.data import DataLoader, WeightedRandomSampler
 """
 print("=== WERYFIKACJA SYSTEMU ===")
 
-if torch.cuda.is_available():                                           #   szukanie karty graficznej nvidia
-    print(f"Wykryto kartę graficzną: {torch.cuda.get_device_name(0)}")
+if torch.cuda.is_available():
+    device = torch.device("cuda")
+    print(f"Wykryto GPU NVIDIA: {torch.cuda.get_device_name(0)}")
+elif torch.backends.mps.is_available():
+    device = torch.device("mps")
+    print("Wykryto akcelerator Apple Silicon (Metal/MPS).")
 else:
-    print("UWAGA: Brak dostępu do GPU!")
+    device = torch.device("cpu")
+    print("Brak sprzętowego wsparcia GPU. System użyje procesora (CPU).")
 """
 ====================================================================================================================
 """
@@ -93,7 +98,7 @@ tokenized_datasets.set_format("torch")
 """
 print("\n=== KROK 4: POBRANIE MODELU ===")
 model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2, use_safetensors=True)
-model.to("cuda")
+model.to(device)
 """
 ====================================================================================================================
 """
