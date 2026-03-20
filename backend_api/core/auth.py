@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from jose import JWTError, jwt
 import bcrypt 
 from fastapi.security import OAuth2PasswordBearer
-from config import SECRET_KEY 
+from core.config import SECRET_KEY 
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7   # valid for a week

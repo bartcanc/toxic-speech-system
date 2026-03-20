@@ -4,3 +4,4 @@ __pycache__/
 *.db
 model/
 training_results/
+databases/

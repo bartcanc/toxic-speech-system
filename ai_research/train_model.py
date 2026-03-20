@@ -104,7 +104,7 @@ model.to(device)
 """
 print("\n=== KROK 5: KONFIGURACJA TRENINGU ===")
 training_args = TrainingArguments(
-    output_dir="./ai_research/training_results",        # gdzie zapisywać postępy
+    output_dir="./training_results",        # gdzie zapisywać postępy
     eval_strategy="epoch",                              # po każdej epoce model jest ewaluowany
     save_strategy="epoch",                              # do epokę zapisywane jest postęp
     learning_rate=2e-5,                                 # prędkość nauki
@@ -136,7 +136,7 @@ print("\n=== KROK 6: TRENING I ZAPISYWANIE MODELU ===")
 print("\nROZPOCZĘCIE FINE TUNINGU...)")
 trainer.train()
 
-trainer.save_model("./ai_research/model")
-tokenizer.save_pretrained("./ai_research/model")
+trainer.save_model("./model")
+tokenizer.save_pretrained("./model")
 
 print("Model jest gotowy")

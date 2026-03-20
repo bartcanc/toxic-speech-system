@@ -2,14 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from email_validator import validate_email, EmailNotValidError
 
-import database
-import auth
-import schemas
+from core import database
+from core import auth
+from schemas import auth_schemas
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 
-@router.post("/register", response_model=schemas.UserResponse)
-def register_user(user: schemas.UserCreate, db: Session = Depends(database.get_db)):                #   depends to open database in case its not open already
+@router.post("/register", response_model=auth_schemas.UserResponse)
+def register_user(user: auth_schemas.UserCreate, db: Session = Depends(database.get_db)):                #   depends to open database in case its not open already
     # try:
     #     validate_email(user.email)
     # except EmailNotValidError:
@@ -28,8 +28,8 @@ def register_user(user: schemas.UserCreate, db: Session = Depends(database.get_d
     
     return new_user
 
-@router.post("/login", response_model=schemas.Token)
-def login(user_credentials: schemas.UserLogin, db: Session = Depends(database.get_db)):             #   depends to open database in case its not open already
+@router.post("/login", response_model=auth_schemas.Token)
+def login(user_credentials: auth_schemas.UserLogin, db: Session = Depends(database.get_db)):             #   depends to open database in case its not open already
     # try:
     #     validate_email(user.email)
     # except EmailNotValidError:

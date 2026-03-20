@@ -3,11 +3,7 @@ from sqlalchemy.orm import relationship, sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
-from config import DATABASE_URL
-
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+from core.database import Base
 
 class User(Base):                                               #   user database
     __tablename__ = "users"
@@ -33,10 +29,3 @@ class Device(Base):                                             #   registered d
 # class ToxicRecord(Base):                                        #   toxicity records    (TBD)
 #     __tablename__ = "toxic_records"
 #     #   TO BE DETERMINED
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
