@@ -1,7 +1,6 @@
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
-# Ścieżka do Twojego wyuczonego modelu (cofamy się o jeden folder wyżej z 'app')
 MODEL_PATH = "./ai_research/model"
 
 # 1. Wybór sprzętu
@@ -32,7 +31,15 @@ def predict_toxicity(text: str) -> dict:
         predicted_class = torch.argmax(probabilities, dim=-1).item()
         confidence = probabilities[0][predicted_class].item() * 100
 
-    verdict_label = "HEJT" if predicted_class == 1 else "OK"
+    verdict_label = ""
+    if predicted_class == 1:
+        verdict_label = "HEJT"
+    elif predicted_class == 2:
+        verdict_label = "SCAM"
+    elif predicted_class == 3:
+        verdict_label = "GROOMING"
+    else:
+        verdict_label = "OK"
     
     return {
         "verdict": verdict_label,

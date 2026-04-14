@@ -11,6 +11,10 @@ class User(Base):                                               #   user databas
     id = Column(Integer, primary_key=True, index=True)          #   id
     email = Column(String, unique=True, index=True)             #   user email
     hashed_password = Column(String)                            #   user password
+    role = Column(String, default="user")                       #   user role (admin/moderator/user)
+
+    reset_code = Column(String, nullable=True)
+    reset_code_expire = Column(DateTime, nullable=True)
     
     devices = relationship("Device", back_populates="owner")
 
