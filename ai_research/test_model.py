@@ -2,13 +2,13 @@ import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 print("=== TESTOWANIE MODELU ===")
-model_path = "./model"
+MODEL_PATH = "./ai_research/model"
 """
 === KROK 1: ZAŁADOWANIE MODELU  ===
 """
 print("Ładowanie modelu z dysku...")
-tokenizer = AutoTokenizer.from_pretrained(model_path)
-model = AutoModelForSequenceClassification.from_pretrained(model_path)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
+model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH)
 
 if torch.cuda.is_available():
     device = torch.device("cuda")
