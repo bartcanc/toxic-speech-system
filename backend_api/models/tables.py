@@ -18,17 +18,15 @@ class User(Base):                                               #   user databas
     
     devices = relationship("Device", back_populates="owner")
 
-class Device(Base):                                             #   registered devices
+class Device(Base):                                                     # registered devices
     __tablename__ = "devices"
-
-    id = Column(Integer, primary_key=True, index=True)          #   id
-    device_id = Column(String, unique=True, index=True)         #   unique device id
-    name = Column(String)                                       #   device name
     
-    owner_id = Column(Integer, ForeignKey("users.id"))          #   owner id
-    
-    owner = relationship("User", back_populates="devices")
-    #records = relationship("ToxicRecord", back_populates="device")
+    id = Column(Integer, primary_key=True, index=True)
+    device_id = Column(String, unique=True, index=True, nullable=False) # fabryczne ID
+    last_seen = Column(DateTime, nullable=True)
+    status = Column(String, default="inactive")                         # inactive, active, error
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=True) 
+    owner = relationship("User")
 
 # class ToxicRecord(Base):                                        #   toxicity records    (TBD)
 #     __tablename__ = "toxic_records"

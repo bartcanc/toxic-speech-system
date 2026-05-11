@@ -1,0 +1,13 @@
+fastapi==0.135.1
+uvicorn==0.41.0
+python-multipart==0.0.22
+SQLAlchemy==2.0.48
+bcrypt==5.0.0
+passlib==1.7.4
+python-jose==3.5.0
+email-validator==2.3.0
+python-dotenv==1.2.2
+transformers==5.3.0
+pydantic==2.12.5
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.5.1

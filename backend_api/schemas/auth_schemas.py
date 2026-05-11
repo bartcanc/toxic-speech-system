@@ -43,3 +43,6 @@ class UserProfile(BaseModel):
 
     class Config:
         from_attributes = True 
+
+class NewDevice(BaseModel):
+    device_id: str

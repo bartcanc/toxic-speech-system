@@ -64,3 +64,21 @@ def delete_user(
     db.commit()
     
     return {"message": f"Użytkownik {user.email} został pomyślnie usunięty."}
+
+
+
+@router.post("/devices")
+def register_factory_device(
+    req: auth_schemas.NewDevice, 
+    db: Session = Depends(database.get_db)
+):
+    """Administrator dodaje nowe fabryczne ID urządzenia do białej listy systemu."""
+    exists = db.query(tables.Device).filter(tables.Device.device_id == req.device_id).first()
+    if exists:
+        raise HTTPException(status_code=400, detail="Urządzenie o tym ID już jest w bazie.")
+        
+    new_device = tables.Device(device_id=req.device_id)
+    db.add(new_device)
+    db.commit()
+    
+    return {"message": f"Dodano {req.device_id} do białej listy sprzętu."}
