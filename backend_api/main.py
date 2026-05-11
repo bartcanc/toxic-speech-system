@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from routers import users
 from routers import analyze
 from routers import admin
+from routers import devices
 
 from core import database
 
@@ -48,6 +49,7 @@ def create_initial_admin():
 app.include_router(users.router)
 app.include_router(analyze.router)
 app.include_router(admin.router)
+app.include_router(devices.router)
 
 @app.on_event("startup")
 async def startup_event():

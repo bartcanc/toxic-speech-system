@@ -3,12 +3,12 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from core import database
 from models import tables
-from models.tables import DevicePing
+from schemas import ai_payloads
 
 router = APIRouter(prefix="/api/devices", tags=["devices"])
 
 @router.post("/ping")
-def device_heartbeat(ping: DevicePing, db: Session = Depends(database.get_db)):
+def device_heartbeat(ping: ai_payloads.DevicePing, db: Session = Depends(database.get_db)):
     
     device = db.query(tables.Device).filter(tables.Device.device_id == ping.device_id).first()
     
