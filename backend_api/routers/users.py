@@ -66,6 +66,7 @@ def get_my_profile(current_user: tables.User = Depends(get_current_user)):
     """
     return {
         "message": "Witaj w strefie dla zalogowanych!",
+        "twoja_nazwa": current_user.username,
         "twoj_email": current_user.email,
         "twoja_rola": current_user.role,
         "twoje_id": current_user.id

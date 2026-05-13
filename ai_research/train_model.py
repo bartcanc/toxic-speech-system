@@ -5,7 +5,7 @@ import numpy as np
 import evaluate
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, TrainingArguments, Trainer
 from torch.utils.data import DataLoader, WeightedRandomSampler
-MODEL_PATH = "./ai_research/model"
+from config import MODEL_PATH, OUTPUT_DIR, CSV_PATH
 
 """
 ====================================================================================================================
@@ -73,7 +73,7 @@ spam_ds = spam_ds.map(map_spam)
 
 # --- 3. ZBIÓR: GROOMING (GROOMING -> Klasa 3) ---
 print("Ładowanie i mapowanie danych o groomingu (PAN-12 CSV)")
-groom_ds = load_dataset("csv", data_files="./ai_research/dane/pan12_dataset.csv", split="train")
+groom_ds = load_dataset("csv", data_files=CSV_PATH, split="train")
 
 groom_ds = groom_ds.cast_column("target", Value("int64"))
 groom_ds = groom_ds.map(map_grooming)
@@ -181,7 +181,7 @@ model.to(device)
 """
 print("\n=== KROK 5: KONFIGURACJA TRENINGU ===")
 training_args = TrainingArguments(
-    output_dir="./ai_research/training_results",        # gdzie zapisywać postępy
+    output_dir=OUTPUT_DIR,                              # gdzie zapisywać postępy
     eval_strategy="epoch",                              # po każdej epoce model jest ewaluowany
     save_strategy="epoch",                              # do epokę zapisywane jest postęp
     learning_rate=2e-5,                                 # prędkość nauki

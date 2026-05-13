@@ -9,6 +9,7 @@ class User(Base):                                               #   user databas
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)          #   id
+    username = Column(String, default=f"new_user_{id}")         #   username
     email = Column(String, unique=True, index=True)             #   user email
     hashed_password = Column(String)                            #   user password
     role = Column(String, default="user")                       #   user role (admin/moderator/user)

@@ -1,7 +1,8 @@
 import os
+from core.config import DATABASE_PATH
 
-if not os.path.exists("./backend_api/databases"):
-    os.mkdir("./backend_api/databases")
+if not os.path.exists(DATABASE_PATH):
+    os.mkdir(DATABASE_PATH)
 
 from fastapi import FastAPI
 from routers import users
@@ -33,6 +34,7 @@ def create_initial_admin():
             hashed_pwd = get_password_hash(admin_password)
             
             new_admin = User(
+                username="admin",
                 email=admin_email, 
                 hashed_password=hashed_pwd, 
                 role="admin"

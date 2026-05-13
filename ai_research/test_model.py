@@ -2,7 +2,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 print("=== TESTOWANIE MODELU ===")
-MODEL_PATH = "./ai_research/model"
+from config import MODEL_PATH
 """
 === KROK 1: ZAŁADOWANIE MODELU  ===
 """

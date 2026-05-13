@@ -1,7 +1,7 @@
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
-MODEL_PATH = "./ai_research/model"
+from core.config import MODEL_PATH
 
 # 1. Wybór sprzętu
 if torch.cuda.is_available():
