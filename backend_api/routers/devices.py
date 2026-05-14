@@ -4,6 +4,7 @@ from datetime import datetime
 from core import database
 from models import tables
 from schemas import ai_payloads
+from zoneinfo import ZoneInfo
 
 router = APIRouter(prefix="/api/devices", tags=["devices"])
 
@@ -19,7 +20,7 @@ def device_heartbeat(ping: ai_payloads.DevicePing, db: Session = Depends(databas
             detail="Odmowa dostępu: Nierozpoznany identyfikator sprzętu."
         )
 
-    device.last_seen = datetime.utcnow()
+    device.last_seen = datetime.now(ZoneInfo("Europe/Warsaw"))
     device.status = ping.status
     db.commit()
     

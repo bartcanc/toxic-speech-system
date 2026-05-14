@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from email_validator import validate_email, EmailNotValidError
 from fastapi.security import OAuth2PasswordRequestForm
@@ -11,6 +11,8 @@ import random
 import string
 from datetime import datetime, timedelta
 from core.auth import get_password_hash
+from services.email_service import send_reset_email
+from zoneinfo import ZoneInfo
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 
@@ -32,7 +34,7 @@ def register_user(user: auth_schemas.UserCreate, db: Session = Depends(database.
     
     hashed_pwd = auth.get_password_hash(user.password)                                              #   else hash the password and save user in the db
     
-    new_user = tables.User(username=user.username,email=user.email, hashed_password=hashed_pwd, created=datetime.utcnow())
+    new_user = tables.User(username=user.username,email=user.email, hashed_password=hashed_pwd, created=datetime.now(ZoneInfo("Europe/Warsaw")))
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -73,9 +75,11 @@ def get_my_profile(current_user: tables.User = Depends(get_current_user)):
         "data utworzenia konta": current_user.created.strftime("%x")
     }
 
+
 @router.post("/forgot-password")
 def request_password_reset(
     req: auth_schemas.PasswordResetRequest, 
+    background_tasks: BackgroundTasks,
     db: Session = Depends(database.get_db)
 ):
     user = db.query(tables.User).filter(tables.User.email == req.email).first()
@@ -83,16 +87,10 @@ def request_password_reset(
     if user:
         code = generate_otp_code()
         user.reset_code = code
-        user.reset_code_expire = datetime.utcnow() + timedelta(minutes=15)
+        user.reset_code_expire = datetime.now(ZoneInfo("Europe/Warsaw")) + timedelta(minutes=15)
         db.commit()
         
-        # symulacja maila (do dodania później)
-        print("\n" + "="*50)
-        print(f"[MOCK EMAIL] Do: {user.email}")
-        print("Temat: Kod resetowania hasła")
-        print(f"Twój jednorazowy kod to: {code}")
-        print("Kod wygasa za 15 minut.")
-        print("="*50 + "\n")
+        background_tasks.add_task(send_reset_email, user.email, code)
 
     return {"message": "Jeśli podany adres e-mail istnieje w naszej bazie, wysłano na niego kod weryfikacyjny."}
 
@@ -106,7 +104,7 @@ def confirm_password_reset(
     if not user or user.reset_code != req.reset_code:
         raise HTTPException(status_code=400, detail="Nieprawidłowy e-mail lub kod weryfikacyjny.")
         
-    if not user.reset_code_expire or datetime.utcnow() > user.reset_code_expire:
+    if not user.reset_code_expire or datetime.now(ZoneInfo("Europe/Warsaw")) > user.reset_code_expire:
         raise HTTPException(status_code=400, detail="Kod weryfikacyjny wygasł. Wygeneruj nowy.")
 
     user.hashed_password = get_password_hash(req.new_password)

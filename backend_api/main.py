@@ -21,6 +21,7 @@ from models.tables import User
 from core.auth import get_password_hash
 
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 def create_initial_admin():
     """tworzenie pierwszego admina, jesli baza jest pusta"""
@@ -40,7 +41,7 @@ def create_initial_admin():
                 email=admin_email, 
                 hashed_password=hashed_pwd, 
                 role="admin",
-                created=datetime.utcnow()
+                created=datetime.now(ZoneInfo("Europe/Warsaw"))
             )
             
             db.add(new_admin)
