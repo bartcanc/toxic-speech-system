@@ -13,6 +13,7 @@ class User(Base):                                               #   user databas
     email = Column(String, unique=True, index=True)             #   user email
     hashed_password = Column(String)                            #   user password
     role = Column(String, default="user")                       #   user role (admin/moderator/user)
+    created = Column(DateTime)                                  #   user creation date
 
     reset_code = Column(String, nullable=True)
     reset_code_expire = Column(DateTime, nullable=True)

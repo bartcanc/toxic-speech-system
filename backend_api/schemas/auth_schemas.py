@@ -3,21 +3,21 @@ from pydantic import BaseModel
 #   INPUT
 class UserCreate(BaseModel):
     username: str
-    email: str
+    email: str = "string@gmail.com"
     password: str
 
 class UserLogin(BaseModel):
-    email: str
+    email: str = "string@gmail.com"
     password: str
 
 class RoleUpdate(BaseModel):
     new_role: str
 
 class PasswordResetRequest(BaseModel):
-    email: str
+    email: str = "string@gmail.com"
 
 class PasswordResetConfirm(BaseModel):
-    email: str
+    email: str = "string@gmail.com"
     reset_code: str
     new_password: str
 
@@ -28,7 +28,7 @@ class PasswordChange(BaseModel):
 #   OUTPUT
 class UserResponse(BaseModel):      #   after register
     id: int
-    email: str
+    email: str = "string@gmail.com"
 
     class Config:
         from_attributes = True
@@ -39,7 +39,7 @@ class Token(BaseModel):             #   after login
 
 class UserProfile(BaseModel):
     id: int
-    email: str
+    email: str = "string@gmail.com"
     role: str
 
     class Config:

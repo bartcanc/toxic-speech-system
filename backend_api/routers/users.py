@@ -32,7 +32,7 @@ def register_user(user: auth_schemas.UserCreate, db: Session = Depends(database.
     
     hashed_pwd = auth.get_password_hash(user.password)                                              #   else hash the password and save user in the db
     
-    new_user = tables.User(email=user.email, hashed_password=hashed_pwd)
+    new_user = tables.User(username=user.username,email=user.email, hashed_password=hashed_pwd, created=datetime.utcnow())
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -69,7 +69,8 @@ def get_my_profile(current_user: tables.User = Depends(get_current_user)):
         "twoja_nazwa": current_user.username,
         "twoj_email": current_user.email,
         "twoja_rola": current_user.role,
-        "twoje_id": current_user.id
+        "twoje_id": current_user.id,
+        "data utworzenia konta": current_user.created.strftime("%x")
     }
 
 @router.post("/forgot-password")

@@ -20,6 +20,8 @@ from core.database import SessionLocal
 from models.tables import User
 from core.auth import get_password_hash
 
+from datetime import datetime
+
 def create_initial_admin():
     """tworzenie pierwszego admina, jesli baza jest pusta"""
     db = SessionLocal()
@@ -37,7 +39,8 @@ def create_initial_admin():
                 username="admin",
                 email=admin_email, 
                 hashed_password=hashed_pwd, 
-                role="admin"
+                role="admin",
+                created=datetime.utcnow()
             )
             
             db.add(new_admin)
