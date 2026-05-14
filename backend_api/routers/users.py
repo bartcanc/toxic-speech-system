@@ -107,6 +107,9 @@ def confirm_password_reset(
     if not user.reset_code_expire or datetime.now(ZoneInfo("Europe/Warsaw")) > user.reset_code_expire:
         raise HTTPException(status_code=400, detail="Kod weryfikacyjny wygasł. Wygeneruj nowy.")
 
+    if auth.verify_password(req.new_password, user.hashed_password):
+        raise HTTPException(status_code=400, detail="Hasła nie mogą być takie same!")
+
     user.hashed_password = get_password_hash(req.new_password)
     
     user.reset_code = None
@@ -131,6 +134,9 @@ def change_password(
             status_code=status.HTTP_400_BAD_REQUEST, 
             detail="Obecne hasło jest nieprawidłowe."
         )
+    
+    if auth.verify_password(req.new_password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Hasła nie mogą być takie same!")
     
     current_user.hashed_password = auth.get_password_hash(req.new_password)
     db.commit()
