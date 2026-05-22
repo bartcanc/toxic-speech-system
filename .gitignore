@@ -5,3 +5,4 @@ __pycache__/
 model/
 training_results/
 databases/
+dane/

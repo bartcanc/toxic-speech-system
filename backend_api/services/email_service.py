@@ -10,7 +10,7 @@ SENDER_EMAIL = os.getenv("EMAIL_SENDER")
 SENDER_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
 if not SENDER_EMAIL or not SENDER_PASSWORD:
-    print("[SYSTEM] Brak danych logowania w pliku .env!")
+    print("[SYSTEM] Brak danych potrzebnych do wysłania maila w pliku .env!")
     raise RuntimeError("Brak konfiguracji e-mail!")
     
 def send_reset_email(receiver_email: str, reset_code: str):
@@ -49,6 +49,3 @@ def send_reset_email(receiver_email: str, reset_code: str):
         
     finally:
         server.quit()
-
-if __name__ == "__main__":
-    send_reset_email("bartekr2002@gmail.com", "X7B9A2")
