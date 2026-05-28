@@ -1,9 +1,48 @@
 services:
-  api:
-    build: .
-    container_name: toxic_speech_api
+  # 1. BAZA DANYCH POSTGRESQL
+  db:
+    image: postgres:15
+    container_name: toxic_system_db
+    env_file:
+      - ./backend_api/.env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # 2. SERWER SZTUCZNEJ INTELIGENCJI
+  ai_research:
+    build: 
+      context: ./ai_research
+    container_name: toxic_system_ai
+    env_file:
+      - ./ai_research/.env
+    ports:
+      - "8001:8001"
+    volumes:
+      - ${MODEL_PATH}:/app/model:ro
+    environment:
+      - MODEL_PATH=/app/model
+    restart: unless-stopped
+
+  # 3. GŁOWNY BACKEND APLIKACJI
+  backend:
+    build: 
+      context: ./backend_api
+    container_name: toxic_system_backend
+    env_file:
+      - ./backend_api/.env
     ports:
       - "8000:8000"
-    volumes:
-      - .:/app
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      - MODEL_PATH=http://ai_research:8001/analyze
     restart: unless-stopped
+
+volumes:
+  pgdata:

@@ -6,7 +6,10 @@ __pycache__/
 *.db
 .env
 ai_research/dane/
+ai_research/notebooks/
+ai_research/model/
 **/*.csv
 ai_research/training_results/
 **/checkpoint-*
 .git/
+train_model.py

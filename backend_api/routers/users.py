@@ -84,7 +84,9 @@ def request_password_reset(
 ):
     user = db.query(tables.User).filter(tables.User.email == req.email).first()
     
-    if user:
+    if not user:
+        raise HTTPException(status_code=400, detail="Użytkownik o takim adresie e-mail nie istnieje w bazie danych.")
+    else:
         code = generate_otp_code()
         user.reset_code = code
         user.reset_code_expire = datetime.now(ZoneInfo("Europe/Warsaw")) + timedelta(minutes=15)

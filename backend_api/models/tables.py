@@ -14,6 +14,7 @@ class User(Base):                                               #   user databas
     hashed_password = Column(String)                            #   user password
     role = Column(String, default="user")                       #   user role (admin/moderator/user)
     created = Column(DateTime)                                  #   user creation date
+    is_premium = Column(Boolean, default=False)                 #   users premium status
 
     reset_code = Column(String, nullable=True)
     reset_code_expire = Column(DateTime, nullable=True)

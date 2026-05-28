@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from schemas.ai_payloads import TextRequest, AnalysisResponse
+from schemas.ai_payloads import TextRequest, AnalysisResponse, AIResults, ConfidenceScores
 from services.ai_engine import predict_toxicity
 
 # Tworzymy niezależny router
@@ -12,12 +12,30 @@ async def analyze_text(request: TextRequest):
 
     try:
         # Odpytujemy nasz niezależny silnik AI
-        result = predict_toxicity(request.text)
+        response_data = predict_toxicity(request.text)
+
+        if response_data.get("status") == "error":
+            raise HTTPException(status_code=503, detail=response_data["message"])
+
+        result = response_data["results"]
+        scores = result["confidence_scores"]
+
+        confidence_obj = ConfidenceScores(
+            toxic=scores["toxic"],
+            scam=scores["scam"],
+            grooming=scores["grooming"]
+        )
+
+        results_obj = AIResults(
+            is_safe=result["is_safe"],
+            detected_flags=result["detected_flags"],
+            confidence_scores=confidence_obj
+        )
 
         return AnalysisResponse(
-            text=request.text,
-            verdict=result["verdict"],
-            confidence_percent=round(result["confidence"], 2)
+            status="success",
+            text_analyzed=request.text,
+            results=results_obj
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Błąd analizy AI: {str(e)}")

@@ -1,12 +1,17 @@
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, Float, DateTime, ForeignKey
-from sqlalchemy.orm import relationship, sessionmaker, Session
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime
- 
-from core.config import DATABASE_URL
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise ValueError("Brak zmiennej DATABASE_URL. Sprawdź docker-compose.yml!")
+
+engine = create_engine(DATABASE_URL)
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 Base = declarative_base()
 
 def get_db():
