@@ -1,9 +1,3 @@
-import os
-from core.config import DATABASE_PATH
-
-if not os.path.exists(DATABASE_PATH):
-    os.mkdir(DATABASE_PATH)
-
 from fastapi import FastAPI
 from routers import users
 from routers import analyze
@@ -11,17 +5,17 @@ from routers import admin
 from routers import devices
 
 from core import database
+from core.database import SessionLocal
+from core.auth import get_password_hash
+
+from models.tables import User
+
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 database.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI(title="Toxic Speech System API")
-
-from core.database import SessionLocal
-from models.tables import User
-from core.auth import get_password_hash
-
-from datetime import datetime
-from zoneinfo import ZoneInfo
 
 def create_initial_admin():
     """tworzenie pierwszego admina, jesli baza jest pusta"""

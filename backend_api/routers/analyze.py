@@ -12,12 +12,18 @@ async def analyze_text(request: TextRequest):
 
     try:
         # Odpytujemy nasz niezależny silnik AI
-        result = predict_toxicity(request.text)
+        response_data = predict_toxicity(request.text)
+
+        if response_data.get("status") == "error":
+            raise HTTPException(status_code=503, detail=response_data["message"])
+
+        result = response_data["results"]
+        scores = result["confidence_scores"]
 
         confidence_obj = ConfidenceScores(
-            toxic=result["confidence_scores"]["hejt"],
-            scam=result["confidence_scores"]["scam"],
-            grooming=result["confidence_scores"]["grooming"]
+            toxic=scores["toxic"],
+            scam=scores["scam"],
+            grooming=scores["grooming"]
         )
 
         results_obj = AIResults(
