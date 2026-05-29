@@ -1,5 +1,5 @@
-fastapi
-uvicorn
+fastapi==0.135.1
+uvicorn==0.41.0
 torch
-transformers
+transformers==5.3.0
 numpy

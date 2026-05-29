@@ -13,3 +13,4 @@ ai_research/training_results/
 **/checkpoint-*
 .git/
 train_model.py
+README.md
