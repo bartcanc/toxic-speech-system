@@ -4,7 +4,7 @@ services:
     image: postgres:15
     container_name: toxic_system_db
     env_file:
-      - ./backend_api/.env
+      - .env
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -21,7 +21,7 @@ services:
       context: ./ai_research
     container_name: toxic_system_ai
     env_file:
-      - ./ai_research/.env
+      - .env
     ports:
       - "8001:8001"
     volumes:
@@ -36,12 +36,12 @@ services:
       context: ./backend_api
     container_name: toxic_system_backend
     env_file:
-      - ./backend_api/.env
+      - .env
     ports:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-      - MODEL_PATH=http://ai_research:8001/analyze
+       - MODEL_PATH=http://ai_research:8001/analyze
     restart: unless-stopped
 
 volumes:
