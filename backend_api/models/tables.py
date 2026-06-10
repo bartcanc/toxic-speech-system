@@ -39,7 +39,7 @@ class Notification(Base):                                               #   user
     id = Column(Integer, primary_key=True, index=True)                                                      #   id
     toxic_record_id = Column(Integer, ForeignKey("toxic_records.id", ondelete="SET NULL"), nullable=True)   #   id rekordu toxicrecord
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)                    #   id uzytkownika, do ktorego wyslane jest powiadomienie
-    title = Column(String(255), nullable=False, default="Nowe powiadomienie")                               #   nazwa powiadomienia
+    title = Column(String(255), nullable=False, default=f"Nowe powiadomienie")                              #   nazwa powiadomienia
     device_name = Column(String(100), nullable=False, default="SafeSound 1st Edition")                      #   nazwa urzadzenia ktore wyslalo powiadomienie
     transcription = Column(Text, nullable=False)                                                            #   transkrypcja audio
     audio_file_path = Column(String(500), nullable=True)                                                    #   sciezka do pliku audio na serwerze
@@ -48,6 +48,12 @@ class Notification(Base):                                               #   user
     is_read = Column(Boolean, default=False)                                                                #   czy powiadomienie zostalo odczytane
     detected_category = Column(Integer, default=0)
 
+    @property
+    def display_title(self):
+        if self.title == "Nowe powiadomienie":
+            return f"{self.title} #{self.id}"
+        return self.title
+    
     user = relationship("User", backref="notifications")
     toxic_record = relationship("ToxicRecord", backref="notification")
     # device = relationship("Device", backref="notifications")

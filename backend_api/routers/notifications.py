@@ -13,10 +13,12 @@ router = APIRouter(
     tags=["Notifications"]
 )
 
+# TODO: Only logged in users can fetch notifications
+
 @router.post("", response_model=NotificationResponse, status_code=status.HTTP_201_CREATED)
 def create_notification(payload: NotificationCreate, db: Session = Depends(get_db)):
     new_notification = Notification(
-        title=payload.title,
+        user_id=payload.user_id,
         device_name=payload.device_name,
         transcription=payload.transcription,
         audio_file_path=payload.audio_file_path,
@@ -37,6 +39,31 @@ def get_all_notifications(
     
     notifications = (
         db.query(Notification)
+        .order_by(Notification.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+    
+    return {
+        "total_records": total,
+        "skip": skip,
+        "limit": limit,
+        "data": notifications
+    }
+
+@router.get("/{user_id}", response_model=PaginatedNotifications)
+def get_all_user_notifs(
+    user_id: int,
+    skip: int = Query(0, ge=0, description="ile rekordow pominac"),
+    limit: int = Query(10, ge=1, le=100, description="ile rekordow pobrac naraz"),
+    db: Session = Depends(get_db)
+):
+    total = db.query(Notification).count()
+    
+    notifications = (
+        db.query(Notification)
+        .filter(Notification.user_id == user_id)
         .order_by(Notification.created_at.desc())
         .offset(skip)
         .limit(limit)

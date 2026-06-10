@@ -3,7 +3,7 @@ from typing import List, Optional
 from datetime import datetime
 
 class NotificationCreate(BaseModel):
-    title: str = "Nowe powiadomienie"
+    user_id : int = 1
     device_name: str = "SafeSound 1st Edition"
     transcription: str
     audio_file_path: str | None = None
@@ -13,6 +13,7 @@ class NotificationResponse(BaseModel):
     id: int
     user_id: Optional[int]
     title: str
+    display_title: str
     device_name: str
     transcription: str
     audio_file_path: Optional[str]
