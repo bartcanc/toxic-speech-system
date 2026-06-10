@@ -3,6 +3,8 @@ from routers import users
 from routers import analyze
 from routers import admin
 from routers import devices
+from routers import notifications
+from routers import toxic_records
 
 from core import database
 from core.database import SessionLocal
@@ -50,6 +52,8 @@ app.include_router(users.router)
 app.include_router(analyze.router)
 app.include_router(admin.router)
 app.include_router(devices.router)
+app.include_router(notifications.router)
+app.include_router(toxic_records.router)
 
 @app.on_event("startup")
 async def startup_event():

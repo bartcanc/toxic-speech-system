@@ -1,7 +1,7 @@
 import os
 import requests
 
-AI_SERVICE_URL = os.getenv("ai_research_URL", "http://ai_research:8001/analyze")
+AI_SERVICE_URL = os.getenv("ai_research_URL")
 
 def predict_toxicity(text: str):
     try:
