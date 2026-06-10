@@ -52,7 +52,7 @@ def get_all_notifications(
         "data": notifications
     }
 
-@router.get("/{user_id}", response_model=PaginatedNotifications)
+@router.get("/users/{user_id}", response_model=PaginatedNotifications)
 def get_all_user_notifs(
     user_id: int,
     skip: int = Query(0, ge=0, description="ile rekordow pominac"),
@@ -76,6 +76,16 @@ def get_all_user_notifs(
         "limit": limit,
         "data": notifications
     }
+
+@router.get("/{id}", response_model=NotificationResponse)
+def get_notification_by_id(id: int, db: Session = Depends(get_db)):
+    notification = db.query(Notification).filter(Notification.id == id).first()
+    if not notification:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"Powiadomienie z id {id} nie zostalo odnalezione"
+        )
+    return notification
 
 @router.patch("/{id}/title", response_model=NotificationResponse)
 def update_notification_title(id: int, payload: UpdateTitleRequest, db: Session = Depends(get_db)):
