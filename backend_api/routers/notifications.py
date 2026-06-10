@@ -77,16 +77,6 @@ def get_all_user_notifs(
         "data": notifications
     }
 
-@router.get("/{id}", response_model=NotificationResponse)
-def get_notification_by_id(id: int, db: Session = Depends(get_db)):
-    notification = db.query(Notification).filter(Notification.id == id).first()
-    if not notification:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, 
-            detail=f"Powiadomienie z id {id} nie zostalo odnalezione"
-        )
-    return notification
-
 @router.patch("/{id}/title", response_model=NotificationResponse)
 def update_notification_title(id: int, payload: UpdateTitleRequest, db: Session = Depends(get_db)):
     notification = db.query(Notification).filter(Notification.id == id).first()
