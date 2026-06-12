@@ -11,7 +11,7 @@ class User(Base):                                               #   user databas
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)          #   id
-    username = Column(String, default=f"new_user_{id}")         #   username
+    username = Column(String, default=f"new_user")              #   username
     email = Column(String, unique=True, index=True)             #   user email
     hashed_password = Column(String)                            #   user password
     role = Column(String, default="user")                       #   user role (admin/moderator/user)
@@ -22,6 +22,7 @@ class User(Base):                                               #   user databas
     reset_code_expire = Column(DateTime, nullable=True)
     
     devices = relationship("Device", back_populates="owner")
+    toxic_records = relationship("ToxicRecord", back_populates="user")
 
 class Device(Base):                                                     # registered devices
     __tablename__ = "devices"
@@ -62,7 +63,10 @@ class ToxicRecord(Base):                                        #   toxicity rec
     __tablename__ = "toxic_records"
 
     id = Column(Integer, primary_key=True, index=True)                                      #   id
+    owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)   #   id wlasciciela urzadzenia, ktore przeslalo dane (transkrypcja i audio)
     text_input = Column(Text, nullable=False)                                               #   transkrypcja audio do analizy
     raw_ai_results = Column(JSONB, nullable=False)                                          #   surowe dane po analizie przez AI
     triggered_flag = Column(String(50), nullable=True)                                      #   co wykrylo ai (label)
     created_at = Column(DateTime, default=lambda: datetime.now(ZoneInfo("Europe/Warsaw")))          #   czas stworzenia rekordu
+
+    user = relationship("User", back_populates="toxic_records")

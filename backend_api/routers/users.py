@@ -14,6 +14,9 @@ from core.auth import get_password_hash
 from services.email_service import send_reset_email
 from zoneinfo import ZoneInfo
 
+from core.database import get_db
+from models.tables import User, Device
+
 router = APIRouter(prefix="/api/users", tags=["users"])
 
 def generate_otp_code(length=6):
@@ -144,3 +147,31 @@ def change_password(
     db.commit()
     
     return {"message": "Hasło zostało pomyślnie zmienione."}
+
+@router.post("/{device_id}/assign", status_code=status.HTTP_200_OK)
+def assign_device_to_user(
+    device_id: str,
+    current_user: User = Depends(get_current_user), 
+    db: Session = Depends(get_db)
+):
+    device = db.query(Device).filter(Device.device_id == device_id).first()
+    if not device:
+        device = Device(device_id=device_id, status="inactive")
+        db.add(device)
+        db.flush()
+
+    if device.owner_id is not None and device.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=400, 
+            detail="To urządzenie jest już przypisane do innego konta."
+        )
+
+    device.owner_id = current_user.id
+    device.status = "active"
+    db.commit()
+
+    return {
+        "message": "Urządzenie pomyślnie przypisane do Twojego konta",
+        "device_id": device.device_id,
+        "owner_id": device.owner_id
+    }

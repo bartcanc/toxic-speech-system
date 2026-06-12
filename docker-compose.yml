@@ -32,6 +32,9 @@ services:
 
   # 3. GŁOWNY BACKEND APLIKACJI
   backend:
+    depends_on:
+      - db
+      - ai_research
     build: 
       context: ./backend_api
     container_name: toxic_system_backend
@@ -39,9 +42,11 @@ services:
       - .env
     ports:
       - "8000:8000"
+    volumes:
+      - ./uploaded_audio:/app/static/audio:z
     environment:
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-       - MODEL_PATH=http://ai_research:8001/analyze
+      - MODEL_PATH=http://ai_research:8001/analyze
     restart: unless-stopped
 
 volumes:
