@@ -32,7 +32,14 @@ class Device(Base):                                                     # regist
     last_seen = Column(DateTime, nullable=True)
     status = Column(String, default="inactive")                         # inactive, active, error
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=True) 
+    
     owner = relationship("User")
+    notifications = relationship(
+        "Notification", 
+        back_populates="device", 
+        primaryjoin="Device.device_id == Notification.device_id", 
+        foreign_keys="[Notification.device_id]"
+    )
 
 class Notification(Base):                                               #   user notifications
     __tablename__ = "notifications"
@@ -41,7 +48,7 @@ class Notification(Base):                                               #   user
     toxic_record_id = Column(Integer, ForeignKey("toxic_records.id", ondelete="SET NULL"), nullable=True)   #   id rekordu toxicrecord
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)                    #   id uzytkownika, do ktorego wyslane jest powiadomienie
     title = Column(String(255), nullable=False, default=f"Nowe powiadomienie")                              #   nazwa powiadomienia
-    device_name = Column(String(100), nullable=False, default="SafeSound 1st Edition")                      #   nazwa urzadzenia ktore wyslalo powiadomienie
+    device_id = Column(String, unique=True, index=True, nullable=False)                                     #   id urzadzenia ktore wyslalo powiadomienie
     transcription = Column(Text, nullable=False)                                                            #   transkrypcja audio
     audio_file_path = Column(String(500), nullable=True)                                                    #   sciezka do pliku audio na serwerze
     audio_duration_seconds = Column(Integer, default=0)                                                     #   czas trwania nagrania w sekundach
@@ -56,8 +63,13 @@ class Notification(Base):                                               #   user
         return self.title
     
     user = relationship("User", backref="notifications")
-    toxic_record = relationship("ToxicRecord", backref="notification")
-    # device = relationship("Device", backref="notifications")
+    toxic_record = relationship("ToxicRecord", backref="notifications")
+    device = relationship(
+        "Device", 
+        back_populates="notifications",
+        primaryjoin="Notification.device_id == Device.device_id", 
+        foreign_keys="[Notification.device_id]"
+    )
 
 class ToxicRecord(Base):                                        #   toxicity records    (TBD)
     __tablename__ = "toxic_records"

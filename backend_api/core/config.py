@@ -9,7 +9,6 @@ load_dotenv()   #   fetching variables from .env file
 SECRET_KEY=""
 DATABASE_URL=""
 DATABASE_PATH=""
-MODEL_PATH=""
 
 """
 
@@ -17,4 +16,3 @@ MODEL_PATH=""
 SECRET_KEY = os.getenv("SECRET_KEY")
 DATABASE_URL = os.getenv("DATABASE_URL")
 DATABASE_PATH = os.getenv("DATABASE_PATH")
-MODEL_PATH = os.getenv("MODEL_PATH")

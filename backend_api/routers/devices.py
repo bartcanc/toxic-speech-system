@@ -55,18 +55,9 @@ def analyze_and_log_task(db_session_factory, transcription: str, db_audio_path: 
             # odczytanie wynikow analizy ai
             ai_response = requests.post(AI_SERVICE_URL, json={"text": transcription}, timeout=10)
             ai_response.raise_for_status()
-            # ---------------------------------
-
-            # mock na potrzeby testów bez sprzętu
-            # ai_response = AIResults(
-            #     is_safe=True, 
-            #     detected_flags={'OK'}, 
-            #     confidence_scores=ConfidenceScores(toxic=0.0, scam=0.0, grooming=0.0)
-            # )
-            # print(ai_response)
             
-            ai_data = ai_response.model_dump() 
-            scores = ai_data.get("confidence_scores", {})
+            ai_json = ai_response.json()
+            scores = ai_json.get("test_results", {})
 
             score_toxic = scores.get("toxic", 0.0)
             score_scam = scores.get("scam", 0.0)
@@ -92,7 +83,7 @@ def analyze_and_log_task(db_session_factory, transcription: str, db_audio_path: 
 
             record = ToxicRecord(
                 text_input=transcription,
-                raw_ai_results=ai_data,
+                raw_ai_results=ai_json,
                 triggered_flag=triggered_flag,
                 owner_id=owner_id
             )
@@ -124,12 +115,20 @@ def analyze_and_log_task(db_session_factory, transcription: str, db_audio_path: 
 @router.post("/upload", status_code=status.HTTP_202_ACCEPTED)
 async def receive_data_from_rpi(
     audio_file: UploadFile = File(...),
-    device_id: str = Form(...),
-    transcription: str = Form(...),
-    duration_seconds: int = Form(...)
+    device_id: str = Form(default="unknown_device"),
+    transcription: str = Form(default=""),
+    duration_seconds: float = Form(default=0.0),
+    db: Session = Depends(database.get_db)
 ):
-    #   TODO: add some sort of validation for file format
     try:
+        device = db.query(tables.Device).filter(tables.Device.device_id == device_id).first()
+
+        if device is None:
+            print("DEBUG: URZĄDZENIE NIEZAREJESTROWANE", flush=True)
+            raise HTTPException(status_code=403, detail="Niezarejestrowane urządzenie")
+
+        duration_int = int(duration_seconds)
+        
         timestamp = int(datetime.now(ZoneInfo("Europe/Warsaw")).timestamp())
         safe_filename = f"{device_id}_{timestamp}_{audio_file.filename}"
         file_path = os.path.join(AUDIO_DIR, safe_filename)
@@ -137,9 +136,9 @@ async def receive_data_from_rpi(
         content = await audio_file.read()
         with open(file_path, "wb") as buffer:
             buffer.write(content)
+            
         db_audio_path = f"/static/audio/{safe_filename}"
 
-        #   rozpoczynamy analize w tle, zeby nie blokowac RPI
         loop = asyncio.get_running_loop()
         loop.run_in_executor(
             None,
@@ -147,7 +146,7 @@ async def receive_data_from_rpi(
             SessionLocal, 
             transcription, 
             db_audio_path, 
-            duration_seconds,
+            duration_int,
             device_id
         )
 

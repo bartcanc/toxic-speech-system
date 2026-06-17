@@ -95,7 +95,7 @@ def get_all_user_notifs(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_admin)
 ):
-    total = db.query(Notification).count()
+    total = db.query(Notification).filter(Notification.user_id == user_id).count()
     
     notifications = (
         db.query(Notification)
