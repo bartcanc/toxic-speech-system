@@ -12,7 +12,7 @@ import asyncio
 
 from core.database import get_db, SessionLocal
 from models.tables import Notification, ToxicRecord, Device
-from schemas.ai_payloads import AIResults, ConfidenceScores
+from schemas.ai_payloads import AIResults, ConfidenceScores, AnalysisResponse
 
 router = APIRouter(prefix="/api/devices", tags=["devices"])
 
@@ -52,19 +52,30 @@ def analyze_and_log_task(db_session_factory, transcription: str, db_audio_path: 
             device = db.query(Device).filter(Device.device_id == device_id).first()
             owner_id = device.owner_id if device else None
             
+            try:
+                from deep_translator import GoogleTranslator
+                translated_text = GoogleTranslator(source='pl', target='en').translate(transcription)
+                print(f"DEBUG: Tłumaczenie zakończone. Oryginał: '{transcription}' -> Angielski: '{translated_text}'", flush=True)
+            except Exception as e:
+                print(f"BŁĄD TŁUMACZENIA: {e}. Używam oryginału jako fallback.", flush=True)
+                translated_text = transcription
+
             # odczytanie wynikow analizy ai
             ai_response = requests.post(AI_SERVICE_URL, json={"text": transcription}, timeout=10)
             ai_response.raise_for_status()
             
             ai_json = ai_response.json()
-            scores = ai_json.get("test_results", {})
+            results = ai_json.get("results", {})
+            scores = results.get("confidence_scores", {})
 
-            score_toxic = scores.get("toxic", 0.0)
-            score_scam = scores.get("scam", 0.0)
-            score_grooming = scores.get("grooming", 0.0)
+            score_toxic = float(scores.get("toxic", 0.0))
+            score_scam = float(scores.get("scam", 0.0))
+            score_grooming = float(scores.get("grooming", 0.0))
+
+            print(f"DEBUG: Sprawdzam flagi. Toxic: {score_toxic} (Próg: {THRESHOLDS['TOXIC']})", flush=True)
 
             # TODO: zamienic triggered flag na liste (do ustalenia)
-            triggered_flag = None
+            triggered_flag = "OK"
             alert_label = "OK"
             category_code = 0
 
@@ -80,6 +91,8 @@ def analyze_and_log_task(db_session_factory, transcription: str, db_audio_path: 
                 triggered_flag = "toxic"
                 alert_label = "TOXIC"
                 category_code = 1
+            else:
+                print("DEBUG: Żaden próg nie został przekroczony!", flush=True)
 
             record = ToxicRecord(
                 text_input=transcription,
@@ -91,11 +104,11 @@ def analyze_and_log_task(db_session_factory, transcription: str, db_audio_path: 
             
             db.flush()
 
-            if triggered_flag is not None:
+            if triggered_flag is not "OK":
                 alert = Notification(
                     user_id=owner_id,
                     title=f"Wykryto zagrożenie: {alert_label}",
-                    device_name="SafeSound Device",
+                    device_id=device_id,
                     transcription=transcription,
                     audio_file_path=db_audio_path,
                     audio_duration_seconds=duration_seconds,
@@ -124,7 +137,7 @@ async def receive_data_from_rpi(
         device = db.query(tables.Device).filter(tables.Device.device_id == device_id).first()
 
         if device is None:
-            print("DEBUG: URZĄDZENIE NIEZAREJESTROWANE", flush=True)
+            print(f"DEBUG: URZĄDZENIE NIEZAREJESTROWANE device_id = {device_id}", flush=True)
             raise HTTPException(status_code=403, detail="Niezarejestrowane urządzenie")
 
         duration_int = int(duration_seconds)

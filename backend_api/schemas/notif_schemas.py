@@ -4,7 +4,7 @@ from datetime import datetime
 
 class NotificationCreate(BaseModel):
     user_id : int = 1
-    device_name: str = "SafeSound 1st Edition"
+    device_id: str = "SafeSound 1st Edition"
     transcription: str
     audio_file_path: str | None = None
     audio_duration_seconds: int = 0
@@ -14,7 +14,7 @@ class NotificationResponse(BaseModel):
     user_id: Optional[int]
     title: str
     display_title: str
-    device_name: str
+    device_id: str
     transcription: str
     audio_file_path: Optional[str]
     audio_duration_seconds: int

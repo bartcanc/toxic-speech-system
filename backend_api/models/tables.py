@@ -48,7 +48,7 @@ class Notification(Base):                                               #   user
     toxic_record_id = Column(Integer, ForeignKey("toxic_records.id", ondelete="SET NULL"), nullable=True)   #   id rekordu toxicrecord
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)                    #   id uzytkownika, do ktorego wyslane jest powiadomienie
     title = Column(String(255), nullable=False, default=f"Nowe powiadomienie")                              #   nazwa powiadomienia
-    device_id = Column(String, unique=True, index=True, nullable=False)                                     #   id urzadzenia ktore wyslalo powiadomienie
+    device_id = Column(String, index=True, nullable=False)                                     #   id urzadzenia ktore wyslalo powiadomienie
     transcription = Column(Text, nullable=False)                                                            #   transkrypcja audio
     audio_file_path = Column(String(500), nullable=True)                                                    #   sciezka do pliku audio na serwerze
     audio_duration_seconds = Column(Integer, default=0)                                                     #   czas trwania nagrania w sekundach
